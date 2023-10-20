@@ -17,7 +17,7 @@ namespace Program
         const int SCREEN_X = 64;
         const int SCREEN_Y = 32;
 
-        const float PIXEL_PADDING = 0.1f;
+        const float PIXEL_PADDING = 0.25f;
 
         const float FULL_PIXEL_WIDTH = (2.0f / SCREEN_X) - ((2*((2.0f / SCREEN_X)*PIXEL_PADDING)/SCREEN_X));
         const float FULL_PIXEL_HEIGHT = (2.0f / SCREEN_Y) - ((2*((2.0f / SCREEN_Y)*PIXEL_PADDING)/SCREEN_Y));
@@ -32,12 +32,14 @@ namespace Program
         const float BACKG = 0.169f;
         const float BACKB = 0.218f;
 
-        const int fps = 60;
-        const int key_freq = 4;
-        const int cycle_freq = 2;
+        const int fps = 1000;
+        const int key_freq = 60;
+        const int cycle_freq = 60;
 
         int SCREEN_TEST = 0;
         byte SCREEN_VAL = 0;
+
+        int run = 0;
 
 
 
@@ -65,7 +67,7 @@ namespace Program
         int[] ElementBuffers;
         int[] VertexArrays;
 
-        public Game(int width, int height, string title) : base(
+        public Game(int width, int height, string title, Chip input_chip) : base(
             GameWindowSettings.Default,
             new NativeWindowSettings() { Size = (width, height), Title = title }
             )
@@ -81,13 +83,12 @@ namespace Program
             VertexArrays = new int[SCREEN_X * SCREEN_Y];
 
 
-            chip = new Chip();
+            chip = input_chip;
             if (SCREEN_TEST == 1)
             {
                 chip.TestSCREEN(SCREEN_VAL);
             }
-            chip.TestSCREEN(0);
-            chip.ReadFileToROM("IBM Logo.ch8");
+            
             
 
             
@@ -111,10 +112,29 @@ namespace Program
 
             
             if (KeyboardState.IsKeyPressed(Keys.Up))
+            {
+                // Console.Write("up..");
+                chip.Cycle();
+            }
+
+            if (KeyboardState.IsKeyPressed(Keys.Right))
+            {
+                // Console.Write("up..");
+                if (run == 0)
                 {
-                    // Console.Write("up..");
-                    chip.Cycle();
+                    run = 1;
                 }
+                else
+                {
+                    run = 0;
+                }
+            }
+
+            // Run cycle
+            if (run == 1)
+            {
+                chip.Cycle();
+            }
             
 
             if (current_frame % (fps / key_freq) == 0)
@@ -122,7 +142,7 @@ namespace Program
                 
                 if (KeyboardState.IsKeyDown(Keys.Down))
                 {
-                    Console.Write("down..");
+                    chip.Cycle();
                 }
             }
 

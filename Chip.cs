@@ -28,6 +28,8 @@ namespace Program
         public static byte VE = 0;
         public static byte VF = 0;
 
+        public static byte SP = 0;
+
         public static short[] MEM = new short[4096];
         public static short[] STACK = new short[16];
         public static byte[] SCREEN_MEM = new byte[32*64];
@@ -58,8 +60,13 @@ namespace Program
                 return;
             }
 
+            if (DELAYTIMER > 0)
+            {
+                DELAYTIMER--;
+            }
+
             
-            Console.Write("| PC: 0x{0} | CODE: 0x{1} | ", PC.ToString("X2"), code);
+            Console.Write("| PC: 0x{0} #{1} | CODE: 0x{2} | ", PC.ToString("X2"), PC, code);
             Execute(code);
             Console.WriteLine();
 
@@ -127,7 +134,7 @@ namespace Program
 
 
 
-        public void OutputMEM(int start = 0, int end = 4096)
+        public static void OutputMEM(int start = 0, int end = 4096)
         {
             int line = 0;
             int row = 0;
@@ -140,7 +147,7 @@ namespace Program
                     row++;
                 }
 
-                Console.Write("0x{0}  ", MEM[i+1].ToString("X3"));
+                Console.Write("0x{0}  ", MEM[i].ToString("X3"));
                 line++;
 
                 if (line % 5 == 0)
@@ -216,6 +223,26 @@ namespace Program
             WriteMEM(Rom.FONT, 0x050, 0x09F+1);
         }
 
+        public static void OutputREG()
+        {
+            Console.WriteLine("    V0 = {0}", V0);
+            Console.WriteLine("    V1 = {0}", V1);
+            Console.WriteLine("    V2 = {0}", V2);
+            Console.WriteLine("    V3 = {0}", V3);
+            Console.WriteLine("    V4 = {0}", V4);
+            Console.WriteLine("    V5 = {0}", V5);
+            Console.WriteLine("    V6 = {0}", V6);
+            Console.WriteLine("    V7 = {0}", V7);
+            Console.WriteLine("    V8 = {0}", V8);
+            Console.WriteLine("    V9 = {0}", V9);
+            Console.WriteLine("    VA = {0}", VA);
+            Console.WriteLine("    VB = {0}", VB);
+            Console.WriteLine("    VC = {0}", VC);
+            Console.WriteLine("    VD = {0}", VD);
+            Console.WriteLine("    VE = {0}", VE);
+            Console.WriteLine("    VF = {0}", VF);
+        }
+
 
         public void ReadFileToROM(string file_path)
         {
@@ -232,11 +259,18 @@ namespace Program
 
                     if (i % 2 == 0)
                     {
-                        string a = v[i].ToString("X2");
-                        string b = v[i+1].ToString("X2");
+                        string a = "";
+                        string b = "";
+
+                        a =  v[i].ToString("X2");
+
+                        if (i+1 < v.Length)
+                        {
+                            b = v[i+1].ToString("X2");
+                        }
 
                         string command = a + b;
-                        Console.WriteLine("0x{0}", command);
+                        Console.WriteLine("  {0}  0x{1}", i, command);
                     }
                 }
             } 
